@@ -15,26 +15,31 @@ def main():
         if folder_index < len(sys.argv):
             folder = sys.argv[folder_index]
 
-    # Klasör yoksa oluştur
     os.makedirs(folder, exist_ok=True)
 
     print(f"Reading config from: {config_file}")
     print(f"Output folder: {folder}")
 
-    # turkish.json dosyasını oku
     try:
         with open(config_file, "r", encoding="utf-8") as f:
             data = json.load(f)
     except Exception as e:
         print(f"Error reading {config_file}: {e}")
-        data = {}
+        data = None
 
-    # Basit çıktı üretelim (örnek olarak bir zaman damgası yaz)
     output_file = os.path.join(folder, "streams.txt")
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(f"Streams updated at: {datetime.utcnow().isoformat()} UTC\n")
         f.write(f"Loaded config: {config_file}\n")
-        f.write(f"Config keys: {', '.join(data.keys()) if data else 'none'}\n")
+
+        if isinstance(data, dict):
+            keys_or_items = ", ".join(data.keys())
+        elif isinstance(data, list):
+            keys_or_items = ", ".join(str(i) for i in range(len(data)))
+        else:
+            keys_or_items = "none"
+
+        f.write(f"Config keys/items: {keys_or_items}\n")
 
     print(f"✅ Stream data updated successfully: {output_file}")
 
